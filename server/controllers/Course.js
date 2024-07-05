@@ -3,7 +3,7 @@
 const Course = require("../models/Course")
 const Category = require("../models/Category")
 const User = require("../models/User");
-const { uploadImageToCloudinary } = require("../utils/imageUploader");
+const { uploadToCloudinary } = require("../utils/imageUploader");
 
 // create course handler 
 exports.createCourse = async (req, res) => {
@@ -45,7 +45,7 @@ exports.createCourse = async (req, res) => {
         }
 
         // upload image to cloudinary
-        const thumbnailImage = await uploadImageToCloudinary(thumbnail, process.env.FOLDER_NAME);
+        const thumbnailImage = await uploadToCloudinary(thumbnail, process.env.FOLDER_NAME);
 
         // start entry in database
         // entry in course db
