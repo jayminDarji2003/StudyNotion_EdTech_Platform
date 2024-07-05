@@ -8,3 +8,8 @@
 ```
 https://api.dicebear.com/5.x/initials/svg?seed=${firstName}${lastName}
 ```
+
+## Razorpay payment gateway
+Read this docs
+LINK : https://razorpay.com/docs/partners/aggregators/partner-auth/payment-gateway/
+
