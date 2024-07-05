@@ -1,7 +1,7 @@
 // COURSE CONTROLLERS
 
 const Course = require("../models/Course")
-const Tag = require("../models/Tag");
+const Category = require("../models/Category")
 const User = require("../models/User");
 const { uploadImageToCloudinary } = require("../utils/imageUploader");
 
@@ -9,13 +9,13 @@ const { uploadImageToCloudinary } = require("../utils/imageUploader");
 exports.createCourse = async (req, res) => {
     try {
         // fetch data from req.body
-        const { courseName, courseDescription, whatYouWillLearn, price, tag } = req.body;
+        const { courseName, courseDescription, whatYouWillLearn, price, tag, categoryId } = req.body;
 
         // fetch file(thumbnail) from req.file
         const thumbnail = req.file.thumbnailImage;
 
         // validation
-        if (!courseName || !courseDescription || !whatYouWillLearn || !price || !tag) {
+        if (!courseName || !courseDescription || !whatYouWillLearn || !price || !tag || !categoryId) {
             return res.status(400).json({
                 success: false,
                 message: "All fields must be required."
@@ -34,12 +34,13 @@ exports.createCourse = async (req, res) => {
             })
         }
 
-        // check Tag valid or not
-        const tagDetails = await Tag.findById(tag);
-        if (!tagDetails) {
+        // check category valid or not
+        // this category come from dropdown so it will be valid 100%
+        const categoryDetails = await Category.findById(categoryId);
+        if (!categoryDetails) {
             return res.status(404).json({
                 success: false,
-                message: "Tag details not found."
+                message: "category details not found."
             })
         }
 
@@ -55,7 +56,8 @@ exports.createCourse = async (req, res) => {
             whatYouWillLearn,
             price,
             thumbnail: thumbnailImage.secure_url,
-            tag: tagDetails._id
+            tag: tag,
+            category: categoryDetails._id,
         })
         console.log("NEW COURSE CREATED SUCCESSFULLY => ", newCourse)
 
@@ -73,9 +75,9 @@ exports.createCourse = async (req, res) => {
 
         console.log("INSTRUCTOR UPDATED SUCCESSFULLY => ", userResponse)
 
-        // entry in tag db
-        const tagResponse = Tag.findByIdAndUpdate(
-            { _id: tagDetails._id },
+        // entry in category db
+        const categoryResponse = Category.findByIdAndUpdate(
+            { _id: categoryDetails._id },
             {
                 $push: {
                     course: newCourse._id,
@@ -84,7 +86,7 @@ exports.createCourse = async (req, res) => {
             { new: true }
         )
 
-        console.log("TAG UPDATED SUCCESSFULLY => ", tagResponse)
+        console.log("CATEGORY UPDATED SUCCESSFULLY => ", categoryResponse)
 
         // return response
         return res.status(200).json({
@@ -106,7 +108,7 @@ exports.createCourse = async (req, res) => {
 
 
 // get all courses handler
-exports.getAllCourses = async (req, res) => {
+exports.showAllCourses = async (req, res) => {
     try {
         // get all courses
         const courses = await Course.find();
