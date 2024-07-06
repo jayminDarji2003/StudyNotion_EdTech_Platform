@@ -86,6 +86,31 @@ exports.createRatingAndReview = async (req, res) => {
 
 // get average rating
 // getAverageRating
+exports.getAverageRating = async (req, res) => {
+    try {
+        // get course id
+        const { courseId } = req.body;
+
+        // calculate average rating
+        const result = await RatingAndReview.aggregate([
+            {
+                $match: {
+                    course: new mongoose.Types.ObjectId(courseId),  // converting string to ObjectId
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    averageRating: { $avg: "$rating" }
+                }
+            }
+        ])
+
+        // return the average rating 
+    } catch (error) {
+
+    }
+}
 
 // get rating and review
 // getAllRatingAndReview
