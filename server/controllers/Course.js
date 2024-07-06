@@ -105,8 +105,6 @@ exports.createCourse = async (req, res) => {
     }
 }
 
-
-
 // get all courses handler
 exports.showAllCourses = async (req, res) => {
     try {
@@ -127,6 +125,61 @@ exports.showAllCourses = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Something went wrong while fetching courses"
+        })
+    }
+}
+
+
+
+// get all course details
+exports.getAllCourseDetails = async (req, res) => {
+    try {
+        // get course id
+        const { courseId } = req.body;
+
+        // find course details
+        const courseDetails = await Course.find(
+            { _id: courseId })
+            .populate({
+                path: "instructor",
+                populate: {
+                    path: "additionalDetails"
+                }
+            })
+            .populate({
+                path: "courseContent",
+                populate: {
+                    path: "subSection",
+                }
+            })
+            .populate("ratingAndReview")
+            .populate("category")
+            .populate("enrolledStudents")
+            .exec();
+
+
+        // validation
+        if (!courseDetails) {
+            return res.status(404).json({
+                success: false,
+                message: "could not find course with whole details"
+            })
+        }
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Course details fetched successfully",
+            data: courseDetails
+        })
+
+
+    } catch (error) {
+        console.log("ERROR OCCURED WHILE GETTING COURSE DETAILS");
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Something went wrong while fetching courses details"
         })
     }
 }
