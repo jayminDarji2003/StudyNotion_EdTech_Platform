@@ -106,15 +106,97 @@ exports.verifySignature = async (req, res) => {
     try {
         // our local webhook secret
         const webhookSecret = "123456789";
-        
+
         // fetching secret from razorpay webhook
         // it is in the "hashed formate"
         const signature = req.headers["x-rasorpay-signature"];
 
         // converting our local webhooksecret to hashed formate
-        crypto.createHmac()
+        // Hmac takes two arguments : Algorithm and secretKey
+        const shahsum = crypto.createHmac("shah256", webhookSecret)
+        shahsum.update(JSON.stringify(req.body));  // converting to string
+        const digest = shahsum.digest("hex");
+
+        // match signature and digest
+        if (signature === digest) {
+            console.log("Payment is Authorized");
+
+            // fetch courseId and userId - it added in the notes
+            const { courseId, userId } = req.body.payload.payment.entity.notes;
+
+            try {
+                // perform the action
+                // find the course and enroll the student
+                const enrolledCourse = await Course.findOneAndUpdate(
+                    { _id: courseId },
+                    { $push: { enrolledStudents: userId } },
+                    { new: true }
+                )
+
+                if (!enrolledCourse) {
+                    return res.status(500).json({
+                        success: false,
+                        message: "Course not found"
+                    })
+                }
+
+                console.log(enrolledCourse)
+
+                // find the student and update the course
+                const enrolledStudent = await User.findOneAndUpdate(
+                    { _id: userId },
+                    { $push: { courses: courseId } },
+                    { new: true }
+                )
+
+                if (!enrolledStudent) {
+                    return res.status(500).json({
+                        success: false,
+                        message: "student not found"
+                    })
+                }
+
+                console.log(enrolledStudent)
+
+
+                // successfully registered to course mail send
+                const emailResponse = await mailSender(
+                    enrolledStudent.email,
+                    "Congratulations from CODEHELP",
+                    "Congratulations! You have successfully registered to the course",
+
+                )
+
+                console.log(emailResponse);
+
+                // return response
+                return res.status(200).json({
+                    success: true,
+                    message: "Signature verification and enrolled student to course successfully"
+                })
+
+            } catch (error) {
+                console.log("ERROR OCCURED WHILE VERIFIYING THE SIGNATURE");
+                console.log(error)
+                return res.status(500).json({
+                    success: false,
+                    message: "Error occured while verifying the signature"
+                })
+            }
+
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: "signature did not match"
+            })
+        }
 
     } catch (error) {
-        
+        console.log("ERROR OCCURED WHILE VERIFIYING THE SIGNATURE");
+        console.log(error)
+        return res.status(500).json({
+            success: false,
+            message: "Error occured while verifying the signature"
+        })
     }
 }
