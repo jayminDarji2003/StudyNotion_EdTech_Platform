@@ -107,10 +107,65 @@ exports.getAverageRating = async (req, res) => {
         ])
 
         // return the average rating 
-    } catch (error) {
+        if (result.length > 0) {
+            return res.status(200).json({
+                success: true,
+                message: "Successfully calculated average rating",
+                averageRating: result[0].averageRating
+            })
+        }
 
+        // if not rating
+        return res.status(200).json({
+            success: true,
+            message: "Average rating is 0, no rating given till now",
+            averageRating: 0
+        })
+
+    } catch (error) {
+        console.log("ERROR OCCURED WHILE CALCULATING AVERAGE RATING");
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Unable to calculate average rating"
+        })
     }
 }
 
 // get rating and review
 // getAllRatingAndReview
+exports.getAllRatingAndReview = async (req, res) => {
+    try {
+        const result = await RatingAndReview.find({})
+            .sort({ rating: "desc" })  // sort rating by descending order
+            .populate("user")
+            .populate("course")
+            .exec();
+
+        if (!result) {
+            return res.status(200).json({
+                success: true,
+                message: "There is no rating available",
+                data: result
+            })
+        }
+
+        console.log("ALL REVIEWS AND RATING => ", result);
+
+        // return response
+        return res.status(200).json({
+            success: true,
+            message: "Rating and review found successfully",
+            data: result
+        })
+
+    } catch (error) {
+        console.log("ERROR OCCURED WHILE FETCHING REVIEW AND RATING");
+        console.log(error);
+        return res.status(500).json({
+            success: false,
+            message: "Unable to fetch review and rating details",
+            data: error.message
+        })
+    }
+}

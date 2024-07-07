@@ -4,10 +4,12 @@ require("dotenv").config();
 const mailSender = async (email, title, body) => {
     try {
         const transporter = nodemailer.createTransport({
-            host: process.env.MAIL_HOST,
+            host: process.env.SMPT_HOST,
+            port: process.env.SMPT_PORT,
+            service: process.env.SMPT_SERVICE,
             auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASS,
+                user: process.env.SMPT_MAIL,
+                pass: process.env.SMPT_PASSWORD,
             },
         });
 
