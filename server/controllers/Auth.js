@@ -4,6 +4,9 @@ const otpGenerator = require("otp-generator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
 require("dotenv").config();
+const mailSender = require("../utils/mailSender")
+const { passwordUpdated } = require("../mail/templates/passwordUpdate")
+const Profile = require("../models/Profile");
 
 // sendOTP controller
 exports.sendOTP = async (req, res) => {
@@ -18,7 +21,7 @@ exports.sendOTP = async (req, res) => {
         if (checkUserPresent) {
             return res.status(401).json({
                 success: false,
-                message: "USER ALREADY REGISTERED"
+                message: "USER IS ALREADY REGISTERED"
             })
         }
 
@@ -120,7 +123,7 @@ exports.signup = async (req, res) => {
                 success: false,
                 message: "OTP NOT FOUND IN DATABASE"
             })
-        } else if (otp !== recentOtp.otp) {
+        } else if (otp !== recentOtp[0].otp) {
             // invalid otp
             return res.status(400).json({
                 success: false,
@@ -130,6 +133,11 @@ exports.signup = async (req, res) => {
 
         // hash password
         const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create the user
+        let approved = ""
+        approved === "Instructor" ? (approved = false) : (approved = true)
+
 
         // entry create in PROFILE database
         const profileDetails = await Profile.create({
@@ -145,8 +153,8 @@ exports.signup = async (req, res) => {
             email,
             contactNumber,
             password: hashedPassword,
-            confirmPassword: hashedPassword,
             accountType,
+            approved,
             additionalDetails: profileDetails._id,
             image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName}${lastName}`  // this api will create an default profile image based on first name and last name
         })
@@ -204,9 +212,12 @@ exports.login = async (req, res) => {
                 accountType: user.accountType
             }
 
-            const token = jwt.sign(payload, process.env.JWT_SECRET, {
-                expiresIn: "2h"
-            })
+            const token = jwt.sign(
+                payload,
+                process.env.JWT_SECRET,
+                {
+                    expiresIn: "24h"
+                })
 
             user.token = token;
             user.password = undefined;
