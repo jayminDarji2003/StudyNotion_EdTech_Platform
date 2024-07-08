@@ -138,8 +138,14 @@ exports.getAllRatingAndReview = async (req, res) => {
     try {
         const result = await RatingAndReview.find({})
             .sort({ rating: "desc" })  // sort rating by descending order
-            .populate("user")
-            .populate("course")
+            .populate({
+                path: "user",
+                select: "firstName lastName email image",  // get only this details only
+            })
+            .populate({
+                path: "Course",
+                select: "courseName"  // just get only couseName only
+            })
             .exec();
 
         if (!result) {

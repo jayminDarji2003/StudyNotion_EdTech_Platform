@@ -5,12 +5,15 @@ const profileSchema = new mongoose.Schema({
         type: String,
         enum: ["male", "female", "other"],
     },
-    dataOfBirth: {
+    dateOfBirth: {
         type: String,
     },
     about: {
         type: String,
         trim: true,
+    } , 
+    phoneNumber: {
+        type: String,
     }
 }, { timestamps: true });
 

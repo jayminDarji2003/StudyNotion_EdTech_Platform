@@ -27,7 +27,7 @@ exports.createSubSection = async (req, res) => {
         // create sub-section
         const subSectionDetails = await SubSection.create({
             title: title,
-            timeDuration: timeDuration,
+            timeDuration: `${videoUploadDetails.duration}`,
             description: description,
             videoUrl: videoUploadDetails.secure_url
         })
@@ -45,7 +45,8 @@ exports.createSubSection = async (req, res) => {
         // return response
         return res.status(200).json({
             success: true,
-            message: "Sub-section created successfully"
+            message: "Sub-section created successfully",
+            data : updatedSection
         })
     } catch (error) {
         console.log("ERROR OCCURED WHILE CREATING SUB-SECTION")
