@@ -14,9 +14,9 @@ const OTPSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now(),
-        expires: 5 * 60  // 5 minutes
+        expires: 10 * 60  // 5 minutes
     }
-},  { timestamps: true });
+}, { timestamps: true });
 
 
 // send OTP to email

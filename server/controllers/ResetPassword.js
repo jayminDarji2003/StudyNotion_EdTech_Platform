@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const mailSender = require("../utils/mailSender");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 
 // reset password token handler
 // this handler is used to send link in mail
@@ -33,14 +34,15 @@ exports.resetPasswordToken = async (req, res) => {
             { new: true }   // to get new document in response
         )
 
-        console.log("UPDATED DOCUMENTS => ", updateDetails)
+        // console.log("UPDATED DOCUMENTS => ", updateDetails)
 
         // create url
         const url = `http://localhost:3000/reset-password/${token}`
 
         // send mail with url
         // 3 parameters : email, subject, body
-        await mailSender(email,
+        await mailSender(
+            email,
             "Password reset link",
             `Your Link for email verification is ${url}. Please click this url to reset your password.`
         )
@@ -55,7 +57,7 @@ exports.resetPasswordToken = async (req, res) => {
         console.log(error)
         return res.status(500).json({
             success: false,
-            message: "Error occured while resetting password"
+            message: error.message
         })
     }
 }
@@ -65,17 +67,17 @@ exports.resetPasswordToken = async (req, res) => {
 exports.resetPassword = async (req, res) => {
     try {
         // data fetch
-        const { newPassword, confirmNewPassword, token } = res.body;
+        const { password, confirmPassword, token } = req.body;
         // note : we can fetch "token" from params also
 
         // validation
-        if (!newPassword || !confirmNewPassword || !token) {
+        if (!password || !confirmPassword || !token) {
             return res.status(401).json({
                 success: false,
                 message: "All fields are required, please fill all the fields"
             })
         }
-        else if (newPassword !== confirmNewPassword) {
+        else if (password !== confirmPassword) {
             return res.status(401).json({
                 success: false,
                 message: "password and confirm password not matching"
@@ -104,7 +106,7 @@ exports.resetPassword = async (req, res) => {
         }
 
         // hash password
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         // update the password
         const updatedUser = await User.findOneAndUpdate(
@@ -116,14 +118,16 @@ exports.resetPassword = async (req, res) => {
         // return response
         return res.status(200).json({
             success: true,
-            message: "Password updated successfully"
+            message: "Password updated successfully",
+            data: updatedUser
         })
     } catch (error) {
         console.log("AN ERROR OCCURED WHILE RESETING PASSWORD");
         console.log(error)
         return res.status(500).json({
             success: false,
-            message: "something went wrong while password reseting"
+            message: "something went wrong while password reseting",
+            error: error.message
         })
     }
 }

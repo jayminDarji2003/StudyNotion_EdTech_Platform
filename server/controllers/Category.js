@@ -44,7 +44,7 @@ exports.createCategory = async (req, res) => {
 
 
 // show all categories handler
-exports.showAllCategory = async (req, res) => {
+exports.showAllCategories = async (req, res) => {
     try {
         // getting all category from database
         const allCategoriesDetails = await Category.find({});

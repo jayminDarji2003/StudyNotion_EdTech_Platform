@@ -113,7 +113,7 @@ exports.getAllUserDetails = async (req, res) => {
         // validation and  get user details
         const userDetails = await User.findById(id).populate("additionalDetails").exec();
 
-        console.log("USER DETAILS => ", userDetails);
+        // console.log("USER DETAILS => ", userDetails);
 
         if (!userDetails) {
             return res.status(404).json({
@@ -144,9 +144,11 @@ exports.updateDisplayPicture = async (req, res) => {
     try {
         // get the image
         const displayPicture = req.files.displayPicture
+        // console.log("DISPLAY PICTURE INFO => ",displayPicture)
 
         // get the user id
         const userId = req.user.id
+        console.log("USER ID => ", req.user.id);
 
         // upload profile image to cloudinary
         const image = await uploadToCloudinary(
@@ -156,7 +158,7 @@ exports.updateDisplayPicture = async (req, res) => {
             1000
         )
 
-        console.log("USER IMAGE DETAILS  => ", image)
+        // console.log("USER IMAGE DETAILS  => ", image)
 
         // update the user profile image
         const updatedProfile = await User.findByIdAndUpdate(

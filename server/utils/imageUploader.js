@@ -15,7 +15,7 @@ exports.uploadToCloudinary = async (file, folder, height, quality) => {
 
     try {
         const result = await cloudinary.uploader.upload(file.tempFilePath, options);
-        console.log("FILE UPLOADED RESULT => ", result);
+        // console.log("FILE UPLOADED RESULT => ", result);
         return result;
     } catch (error) {
         console.log("ERROR IN FILE UPLOAD TO Cloudinary");

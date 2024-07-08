@@ -7,12 +7,15 @@ require("dotenv").config();
 const mailSender = require("../utils/mailSender")
 const { passwordUpdated } = require("../mail/templates/passwordUpdate")
 const Profile = require("../models/Profile");
+// const mailSender = require("../utils/mailSender");
+const otpTemplate = require("../mail/templates/emailVerificationTemplate");
 
 // sendOTP controller
 exports.sendOTP = async (req, res) => {
     try {
         // fetch the email from req.body
         const { email } = req.body;
+
 
         // check if user is already exist
         const checkUserPresent = await User.findOne({ email });
@@ -32,8 +35,6 @@ exports.sendOTP = async (req, res) => {
             specialChars: false   // not add special chars
         });
 
-        console.log("OTP GENERATED => ", otp);
-
         // make sure otp must be unique
         let result = await OTP.findOne({ otp: otp });
 
@@ -46,12 +47,16 @@ exports.sendOTP = async (req, res) => {
             result = await OTP.findOne({ otp: otp });
         }
 
+
+        // send otp to email
+        const mailResponse = await mailSender(email, "Verification code : StudyNotion", otpTemplate(otp));
+
         // create OTP object
         const otpPayload = { email, otp };
 
         // create entry in database OTP.
         const otpBody = await OTP.create(otpPayload);
-        console.log("OTP BODY => ", otpBody);
+        console.log(otpBody)
 
         // return response
         res.status(200).json({
@@ -69,6 +74,7 @@ exports.sendOTP = async (req, res) => {
         })
     }
 };
+
 
 
 // signup controller
@@ -121,7 +127,7 @@ exports.signup = async (req, res) => {
             // did not get any otp
             return res.status(400).json({
                 success: false,
-                message: "OTP NOT FOUND IN DATABASE"
+                message: "OTP IS NOT MATCH"
             })
         } else if (otp !== recentOtp[0].otp) {
             // invalid otp
@@ -156,7 +162,7 @@ exports.signup = async (req, res) => {
             accountType,
             approved,
             additionalDetails: profileDetails._id,
-            image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName}${lastName}`  // this api will create an default profile image based on first name and last name
+            image: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`  // this api will create an default profile image based on first name and last name
         })
 
         // return response
