@@ -10,8 +10,8 @@ exports.createSubSection = async (req, res) => {
         // fetch data from req.body
         const { sectionId, title, timeDuration, description } = req.body;
 
-        // extract file/video from req.file
-        const video = req.file.videoFile;
+        // extract file/video from req.files
+        const video = req.files.videoFile;
 
         // validation   
         if (!sectionId || !title || !timeDuration || !description || !video) {
@@ -22,7 +22,7 @@ exports.createSubSection = async (req, res) => {
         }
 
         // upload video to cloudinary
-        const videoUploadDetails = await uploadToCloudinary(videoUrl, process.env.FOLDER_NAME)
+        const videoUploadDetails = await uploadToCloudinary(video, process.env.FOLDER_NAME)
 
         // create sub-section
         const subSectionDetails = await SubSection.create({
@@ -40,7 +40,7 @@ exports.createSubSection = async (req, res) => {
                 }
             },
             { new: true }
-        ).pupulate("subSection").exec();
+        );
 
         // return response
         return res.status(200).json({
@@ -53,7 +53,7 @@ exports.createSubSection = async (req, res) => {
         console.log(error);
         return res.status(500).json({
             success: false,
-            message: "Error occured while creating sub-section"
+            message: error.message
         })
     }
 }
@@ -106,7 +106,7 @@ exports.updateSubSection = async (req, res) => {
         console.error(error)
         return res.status(500).json({
             success: false,
-            message: "An error occurred while updating the section",
+            message: error.message,
         })
     }
 }

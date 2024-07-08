@@ -24,12 +24,13 @@ exports.createCategory = async (req, res) => {
             categoryDescription: categoryDescription
         })
 
-        console.log("CATEGORY CREATED SUCCESSFULLY => ", categoryDetails)
+        // console.log("CATEGORY CREATED SUCCESSFULLY => ", categoryDetails)
 
         // response send
         return res.status(200).json({
             success: true,
-            message: "category created successfully"
+            message: "category created successfully",
+            data: categoryDetails
         })
 
     } catch (error) {
@@ -48,7 +49,8 @@ exports.showAllCategories = async (req, res) => {
     try {
         // getting all category from database
         const allCategoriesDetails = await Category.find({});
-        console.log("ALL CATEGORIES => ", allCategoriesDetails);
+
+        // console.log("ALL CATEGORIES => ", allCategoriesDetails);
 
         // send response
         return res.status(200).json({

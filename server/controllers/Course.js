@@ -25,14 +25,14 @@ exports.createCourse = async (req, res) => {
         } = req.body;
 
         // fetch file(thumbnail) from req.file
-        const thumbnail = req.file.thumbnailImage;
+        const thumbnail = req.files.thumbnailImage;
 
         // Convert the tag and instructions from stringified Array to Array
         const tag = JSON.parse(_tag)
         const instructions = JSON.parse(_instructions)
 
-        console.log("tag", tag)
-        console.log("instructions", instructions)
+        // console.log("tag", tag)
+        // console.log("instructions", instructions)
 
         // validation
         if (
@@ -63,7 +63,7 @@ exports.createCourse = async (req, res) => {
         const instructorDetails = await User.findById(userId,
             { accountType: "Instructor" }
         );
-        console.log("INSTRUCTOR DETAILS => ", instructorDetails)
+        // console.log("INSTRUCTOR DETAILS => ", instructorDetails)
 
         if (!instructorDetails) {
             return res.status(404).json({
@@ -102,7 +102,7 @@ exports.createCourse = async (req, res) => {
             status,
             instructions,
         })
-        console.log("NEW COURSE CREATED SUCCESSFULLY => ", newCourse)
+        // console.log("NEW COURSE CREATED SUCCESSFULLY => ", newCourse)
 
         // entry in user db
         // add new course to user schema
@@ -116,7 +116,7 @@ exports.createCourse = async (req, res) => {
             { new: true }
         )
 
-        console.log("INSTRUCTOR UPDATED SUCCESSFULLY => ", userResponse)
+        // console.log("INSTRUCTOR UPDATED SUCCESSFULLY => ", userResponse)
 
         // entry in category db
         const categoryResponse = Category.findByIdAndUpdate(
@@ -129,7 +129,7 @@ exports.createCourse = async (req, res) => {
             { new: true }
         )
 
-        console.log("CATEGORY UPDATED SUCCESSFULLY => ", categoryResponse)
+        // console.log("CATEGORY UPDATED SUCCESSFULLY => ", categoryResponse)
 
         // return response
         return res.status(200).json({

@@ -29,7 +29,7 @@ exports.createSection = async (req, res) => {
             courseId,
             {
                 $push: {
-                    courseContent: newSection._id,
+                    courseContent: sectionDetails._id,
                 },
             },
             { new: true }
@@ -66,7 +66,7 @@ exports.updateSection = async (req, res) => {
         // fetch data
         const { sectionName, sectionId, courseId } = req.body;
 
-        // data validation
+        // data validation 
         if (!sectionName || !sectionId) {
             return res.status(400).json({
                 success: false,
@@ -114,7 +114,7 @@ exports.deleteSection = async (req, res) => {
     try {
         //fetch section id
         // getting id from params
-        const { sectionId, courseId } = req.params;
+        const { sectionId, courseId } = req.body;
 
         // get section data
         const section = await Section.findById(sectionId);

@@ -76,17 +76,17 @@ exports.isInstructor = async (req, res, next) => {
     try {
         const userDetails = await User.findOne({ email: req.user.email });
 
-        if (userDetails.accountType !== "Admin") {
+        if (userDetails.accountType !== "Instructor") {
             return res.status(401).json({
                 success: false,
-                message: "This is a Protected Route for Admin",
+                message: "This is a Protected Route for Intructor",
             });
         }
         next();
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "User role cannot be verified, please try again"
+            message: "This is a Protected Route for Intructor",
         })
     }
 }
@@ -99,17 +99,17 @@ exports.isAdmin = async (req, res, next) => {
 
         // console.log(userDetails.accountType);
 
-        if (userDetails.accountType !== "Instructor") {
+        if (userDetails.accountType !== "Admin") {
             return res.status(401).json({
                 success: false,
-                message: "This is a Protected Route for Instructor",
+                message: "This is a Protected Route for Admin",
             });
         }
         next();
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: "User role cannot be verified, please try again"
+            message: "This is a protected Route for Admin",
         })
     }
 }
