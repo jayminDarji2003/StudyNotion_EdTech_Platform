@@ -54,8 +54,9 @@ exports.isStudent = async (req, res, next) => {
     try {
         const userDetails = await User.findOne({ email: req.user.email });
 
+        console.log(userDetails)
 
-        if (userDetails.acccountType !== "Student") {
+        if (userDetails.accountType !== "Student") {
             return res.status(401).json({
                 success: false,
                 message: "This is a protected route for Students"

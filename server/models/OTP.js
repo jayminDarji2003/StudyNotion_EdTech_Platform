@@ -14,7 +14,7 @@ const OTPSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now(),
-        expires: 10 * 60  // 5 minutes
+        expires: 20 * 60
     }
 }, { timestamps: true });
 

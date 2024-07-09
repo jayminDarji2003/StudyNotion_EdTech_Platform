@@ -1,6 +1,7 @@
 // RATING AND REVIEW CONTROLLERS
 const RatingAndReview = require("../models/RatingAndReview");
 const Course = require("../models/Course");
+const { default: mongoose } = require("mongoose");
 
 // create rating and review
 // createRatingAndReview
